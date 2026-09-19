@@ -1,0 +1,413 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5412E256305EF7EA00B1CF44 /* SpeechRelay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5412E255305EF7EA00B1CF44 /* SpeechRelay.swift */; };
+		A10000000000000000000001 /* FallGuardApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000001 /* FallGuardApp.swift */; };
+		A10000000000000000000002 /* HomeProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000002 /* HomeProfile.swift */; };
+		A10000000000000000000003 /* Incident.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000003 /* Incident.swift */; };
+		A10000000000000000000004 /* ProtocolPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000004 /* ProtocolPrompt.swift */; };
+		A10000000000000000000005 /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* APIClient.swift */; };
+		A10000000000000000000006 /* LiveTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* LiveTools.swift */; };
+		A10000000000000000000007 /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* AppModel.swift */; };
+		A1000000000000000000001B /* DeskAgent.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001B /* DeskAgent.swift */; };
+		A10000000000000000000008 /* CameraRearService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* CameraRearService.swift */; };
+		A10000000000000000000009 /* AudioIO.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000009 /* AudioIO.swift */; };
+		A1000000000000000000000A /* PoseTrigger.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000A /* PoseTrigger.swift */; };
+		A1000000000000000000000B /* LiveSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000B /* LiveSessionManager.swift */; };
+		A1000000000000000000000C /* MonitorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000C /* MonitorView.swift */; };
+		A1000000000000000000000D /* ClipRingBuffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000D /* ClipRingBuffer.swift */; };
+		A1000000000000000000000E /* IncidentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000E /* IncidentView.swift */; };
+		A1000000000000000000000F /* TalkService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000F /* TalkService.swift */; };
+		A10000000000000000000010 /* FamilyHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* FamilyHomeView.swift */; };
+		A10000000000000000000011 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000011 /* SettingsView.swift */; };
+		A10000000000000000000012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000012 /* Assets.xcassets */; };
+		A10000000000000000000019 /* TestClip.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000019 /* TestClip.mp4 */; };
+		A1000000000000000000001A /* ClipReplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000001A /* ClipReplay.swift */; };
+		A10000000000000000000013 /* FirebaseAILogic in Frameworks */ = {isa = PBXBuildFile; productRef = P10000000000000000000001 /* FirebaseAILogic */; };
+		A10000000000000000000014 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = P10000000000000000000002 /* FirebaseMessaging */; };
+		A10000000000000000000015 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = P10000000000000000000003 /* FirebaseCore */; };
+		A10000000000000000000016 /* QRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000015 /* QRCode.swift */; };
+		A10000000000000000000017 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000016 /* GoogleService-Info.plist */; };
+		E3DC1A072585E65ACFE4959E /* FirebaseAppCheck in Frameworks */ = {isa = PBXBuildFile; productRef = 9F0F63B126F9116989611B47 /* FirebaseAppCheck */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		5412E255305EF7EA00B1CF44 /* SpeechRelay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechRelay.swift; sourceTree = "<group>"; };
+		B10000000000000000000001 /* FallGuardApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FallGuardApp.swift; sourceTree = "<group>"; };
+		B10000000000000000000002 /* HomeProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeProfile.swift; sourceTree = "<group>"; };
+		B10000000000000000000003 /* Incident.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Incident.swift; sourceTree = "<group>"; };
+		B10000000000000000000004 /* ProtocolPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProtocolPrompt.swift; sourceTree = "<group>"; };
+		B10000000000000000000005 /* APIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIClient.swift; sourceTree = "<group>"; };
+		B10000000000000000000006 /* LiveTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveTools.swift; sourceTree = "<group>"; };
+		B10000000000000000000007 /* AppModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppModel.swift; sourceTree = "<group>"; };
+		B1000000000000000000001B /* DeskAgent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeskAgent.swift; sourceTree = "<group>"; };
+		B10000000000000000000008 /* CameraRearService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraRearService.swift; sourceTree = "<group>"; };
+		B10000000000000000000009 /* AudioIO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioIO.swift; sourceTree = "<group>"; };
+		B1000000000000000000000A /* PoseTrigger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseTrigger.swift; sourceTree = "<group>"; };
+		B1000000000000000000000B /* LiveSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveSessionManager.swift; sourceTree = "<group>"; };
+		B1000000000000000000000C /* MonitorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitorView.swift; sourceTree = "<group>"; };
+		B1000000000000000000000D /* ClipRingBuffer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipRingBuffer.swift; sourceTree = "<group>"; };
+		B1000000000000000000000E /* IncidentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IncidentView.swift; sourceTree = "<group>"; };
+		B1000000000000000000000F /* TalkService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkService.swift; sourceTree = "<group>"; };
+		B10000000000000000000010 /* FamilyHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyHomeView.swift; sourceTree = "<group>"; };
+		B10000000000000000000011 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		B10000000000000000000012 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B10000000000000000000019 /* TestClip.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = TestClip.mp4; path = Resources/TestClip.mp4; sourceTree = "<group>"; };
+		B1000000000000000000001A /* ClipReplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipReplay.swift; sourceTree = "<group>"; };
+		B10000000000000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B10000000000000000000014 /* FallGuard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FallGuard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10000000000000000000015 /* QRCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRCode.swift; sourceTree = "<group>"; };
+		B10000000000000000000016 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C10000000000000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000015 /* FirebaseCore in Frameworks */,
+				A10000000000000000000013 /* FirebaseAILogic in Frameworks */,
+				A10000000000000000000014 /* FirebaseMessaging in Frameworks */,
+				E3DC1A072585E65ACFE4959E /* FirebaseAppCheck in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D10000000000000000000001 = {
+			isa = PBXGroup;
+			children = (
+				D10000000000000000000002 /* FallGuard */,
+				D10000000000000000000006 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D10000000000000000000002 /* FallGuard */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000001 /* FallGuardApp.swift */,
+				B10000000000000000000012 /* Assets.xcassets */,
+				B10000000000000000000019 /* TestClip.mp4 */,
+				B10000000000000000000013 /* Info.plist */,
+				B10000000000000000000016 /* GoogleService-Info.plist */,
+				D10000000000000000000003 /* Shared */,
+				D10000000000000000000004 /* Hub */,
+				D10000000000000000000005 /* Family */,
+				D10000000000000000000007 /* Settings */,
+			);
+			path = FallGuard;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000003 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000002 /* HomeProfile.swift */,
+				B10000000000000000000003 /* Incident.swift */,
+				B10000000000000000000004 /* ProtocolPrompt.swift */,
+				B10000000000000000000005 /* APIClient.swift */,
+				B10000000000000000000006 /* LiveTools.swift */,
+				B10000000000000000000007 /* AppModel.swift */,
+				B1000000000000000000001B /* DeskAgent.swift */,
+				B10000000000000000000015 /* QRCode.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000004 /* Hub */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000008 /* CameraRearService.swift */,
+				B10000000000000000000009 /* AudioIO.swift */,
+				B1000000000000000000000A /* PoseTrigger.swift */,
+				B1000000000000000000000B /* LiveSessionManager.swift */,
+				B1000000000000000000000C /* MonitorView.swift */,
+				B1000000000000000000000D /* ClipRingBuffer.swift */,
+				B1000000000000000000001A /* ClipReplay.swift */,
+				5412E255305EF7EA00B1CF44 /* SpeechRelay.swift */,
+			);
+			path = Hub;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000005 /* Family */ = {
+			isa = PBXGroup;
+			children = (
+				B1000000000000000000000E /* IncidentView.swift */,
+				B1000000000000000000000F /* TalkService.swift */,
+				B10000000000000000000010 /* FamilyHomeView.swift */,
+			);
+			path = Family;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000006 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000014 /* FallGuard.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D10000000000000000000007 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				B10000000000000000000011 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E10000000000000000000001 /* FallGuard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F10000000000000000000003 /* Build configuration list for PBXNativeTarget "FallGuard" */;
+			buildPhases = (
+				E10000000000000000000002 /* Sources */,
+				C10000000000000000000001 /* Frameworks */,
+				E10000000000000000000003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FallGuard;
+			packageProductDependencies = (
+				P10000000000000000000001 /* FirebaseAILogic */,
+				P10000000000000000000002 /* FirebaseMessaging */,
+				P10000000000000000000003 /* FirebaseCore */,
+				9F0F63B126F9116989611B47 /* FirebaseAppCheck */,
+			);
+			productName = FallGuard;
+			productReference = B10000000000000000000014 /* FallGuard.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E10000000000000000000000 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1600;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					E10000000000000000000001 = {
+						CreatedOnToolsVersion = 16.0;
+					};
+				};
+			};
+			buildConfigurationList = F10000000000000000000001 /* Build configuration list for PBXProject "FallGuard" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D10000000000000000000001;
+			packageReferences = (
+				P10000000000000000000000 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
+			productRefGroup = D10000000000000000000006 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				E10000000000000000000001 /* FallGuard */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E10000000000000000000003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000012 /* Assets.xcassets in Resources */,
+				A10000000000000000000019 /* TestClip.mp4 in Resources */,
+				A10000000000000000000017 /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		E10000000000000000000002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000000000000000000001 /* FallGuardApp.swift in Sources */,
+				A10000000000000000000002 /* HomeProfile.swift in Sources */,
+				A10000000000000000000003 /* Incident.swift in Sources */,
+				A10000000000000000000004 /* ProtocolPrompt.swift in Sources */,
+				A10000000000000000000005 /* APIClient.swift in Sources */,
+				A10000000000000000000006 /* LiveTools.swift in Sources */,
+				A10000000000000000000007 /* AppModel.swift in Sources */,
+				A1000000000000000000001B /* DeskAgent.swift in Sources */,
+				A10000000000000000000008 /* CameraRearService.swift in Sources */,
+				A10000000000000000000009 /* AudioIO.swift in Sources */,
+				A1000000000000000000000A /* PoseTrigger.swift in Sources */,
+				A1000000000000000000000B /* LiveSessionManager.swift in Sources */,
+				A1000000000000000000000C /* MonitorView.swift in Sources */,
+				5412E256305EF7EA00B1CF44 /* SpeechRelay.swift in Sources */,
+				A1000000000000000000000D /* ClipRingBuffer.swift in Sources */,
+				A1000000000000000000001A /* ClipReplay.swift in Sources */,
+				A1000000000000000000000E /* IncidentView.swift in Sources */,
+				A1000000000000000000000F /* TalkService.swift in Sources */,
+				A10000000000000000000010 /* FamilyHomeView.swift in Sources */,
+				A10000000000000000000011 /* SettingsView.swift in Sources */,
+				A10000000000000000000016 /* QRCode.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		F20000000000000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_TESTABILITY = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		F20000000000000000000002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F20000000000000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FM9L2RV5V2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FallGuard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.watchfall.FallGuard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		F20000000000000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = FM9L2RV5V2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = FallGuard/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_BUNDLE_IDENTIFIER = com.watchfall.FallGuard;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F10000000000000000000001 /* Build configuration list for PBXProject "FallGuard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F20000000000000000000001 /* Debug */,
+				F20000000000000000000002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F10000000000000000000003 /* Build configuration list for PBXNativeTarget "FallGuard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F20000000000000000000003 /* Debug */,
+				F20000000000000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		P10000000000000000000000 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9F0F63B126F9116989611B47 /* FirebaseAppCheck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = P10000000000000000000000 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAppCheck;
+		};
+		P10000000000000000000001 /* FirebaseAILogic */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = P10000000000000000000000 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAILogic;
+		};
+		P10000000000000000000002 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = P10000000000000000000000 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		P10000000000000000000003 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = P10000000000000000000000 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = E10000000000000000000000 /* Project object */;
+}

@@ -1,0 +1,12 @@
+.DS_Store
+backend/node_modules
+backend/.env
+FallGuard/FallGuard/GoogleService-Info.plist
+FallGuard/FallGuard/AppCheckDebugToken.swift
+.appcheck-debug-token
+*.xcuserstate
+xcuserdata/
+DerivedData/
+testdata/*.mp4
+FallGuard/FallGuard/Resources/TestClip.mp4
+backend/public/clips/
