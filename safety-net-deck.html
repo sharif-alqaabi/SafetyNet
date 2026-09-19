@@ -144,16 +144,6 @@ h2{font:600 clamp(34px,5.2vw,84px)/1.02 var(--f-d);letter-spacing:-.025em;text-w
    </div>
   </section>
 
-  <section class="slide" data-steps="2" aria-label="Meet Margaret">
-   <div class="col">
-    <p class="eyebrow a r" style="--d:0">Tuesday afternoon &middot; San Francisco</p>
-    <h2 class="r scan" style="--d:1">Meet <span class="grad">Margaret.</span></h2>
-    <p class="lead r" style="--d:2">She lives on her own. She likes her tea strong and her kitchen quiet. Her window looks out toward the Golden Gate, and today a small camera is watching the room.</p>
-    <p class="lead r" data-step="1"><b>Safety Net is on.</b> Gemini Live is watching her, frame by frame.</p>
-    <p class="lead r" data-step="2">She is 81. Steady on her feet, mostly. And like a lot of people her age in this city, <b>alone from breakfast to bedtime.</b></p>
-   </div>
-  </section>
-
   <section class="slide" data-steps="3" aria-label="The problem">
    <div class="col tight">
     <p class="eyebrow c r" style="--d:0">She is not unusual</p>
@@ -164,6 +154,16 @@ h2{font:600 clamp(34px,5.2vw,84px)/1.02 var(--f-d);letter-spacing:-.025em;text-w
     <div class="sig one r" data-step="2"><b><em>97%</em> who owned a pendant alarm never pressed it</b><span>Most couldn't reach it. The device meant to help is the one thing they can't get to.</span></div>
     <div class="sig one r" data-step="3"><b><em>43%</em> of real falls missed. Up to <em>85</em> false alarms a day.</b><span>Wearables ace staged lab falls. On real ones they miss 4 in 10 and cry wolf all day. Safety Net asks before it alerts anyone.</span></div>
     <p class="src r" style="--d:4">Sources: CDC · SF DAS · Fleming &amp; Brayne, BMJ 2008 · Bagalà et al., PLOS ONE 2012</p>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="2" aria-label="Meet Margaret">
+   <div class="col">
+    <p class="eyebrow a r" style="--d:0">Tuesday afternoon &middot; San Francisco</p>
+    <h2 class="r scan" style="--d:1">Meet <span class="grad">Margaret.</span></h2>
+    <p class="lead r" style="--d:2">She lives on her own. She likes her tea strong and her kitchen quiet. Her window looks out toward the Golden Gate, and today a small camera is watching the room.</p>
+    <p class="lead r" data-step="1"><b>Safety Net is on.</b> Gemini Live is watching her, frame by frame.</p>
+    <p class="lead r" data-step="2">She is 81. Steady on her feet, mostly. And like a lot of people her age in this city, <b>alone from breakfast to bedtime.</b></p>
    </div>
   </section>
 
@@ -564,8 +564,8 @@ var tags=$$('.tag'),spkC=$('#spkC'),spkM=$('#spkM');
 /* ---- shots and levels ---- */
 var SH=[
  {p:[.6,2.5,6.4],l:[0,1,-.6],sx:.17,orb:.5},
- {p:[1.2,1.5,3.0],l:[2.3,1.0,.3],sx:.17},
  {p:[.3,7.6,3.4],l:[.2,0,-.3],sx:.17},
+ {p:[1.2,1.5,3.0],l:[2.3,1.0,.3],sx:.17},
  {p:[3.6,.95,2.8],l:[1.4,.45,.1],sx:.17},
  {p:[1.5,1.25,3.5],l:[1.0,.6,.1],sx:.18},
  {p:[-.6,1.15,2.3],l:[1.0,.5,.1],sx:.17},
@@ -728,7 +728,7 @@ function update(dt){
  }
 
  /* camera cone */
- var camOn=(cur===1&&step>=1)||cur>1;
+ var camOn=(cur===2&&step>=1)||cur>2;
  coneM.opacity+=((camOn?.055:0)-coneM.opacity)*k;
  led.visible=Math.sin(T*4)>-.3;
 
