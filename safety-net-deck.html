@@ -1,0 +1,806 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Safety Net Stage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400..800&family=DM+Sans:wght@400..700&family=JetBrains+Mono:wght@400..700&display=swap">
+<style>
+:root{--night:#0B0D12;--deep:#151922;--ink:#EEF1F5;--mute:#8B93A7;--blue:#34C3D1;--violet:#8FA3B8;--coral:#E14B4B;--amber:#F2B84B;--green:#34C3D1;--line:rgba(139,147,167,.22);
+--f-d:'Outfit',system-ui,sans-serif;--f-b:'DM Sans',system-ui,sans-serif;--f-m:'JetBrains Mono',ui-monospace,monospace;color-scheme:dark}
+html,body{height:100%}
+body{margin:0;background:var(--night);color:var(--ink);font-family:var(--f-b);overflow:hidden}
+#app{position:fixed;inset:0;background:radial-gradient(ellipse at 70% 40%,#161B26 0%,var(--night) 70%)}
+#gl{position:absolute;inset:0;width:100%;height:100%;display:block}
+#scrim{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(11,13,18,.9) 0%,rgba(11,13,18,.55) 34%,rgba(11,13,18,0) 62%)}
+#grain{position:absolute;inset:0;pointer-events:none;opacity:.04;mix-blend-mode:screen;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+#labels,#det{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.tag{position:absolute;left:0;top:0;font:600 12px/1 var(--f-m);letter-spacing:.14em;text-transform:uppercase;padding:7px 10px;border:1px solid var(--c);color:var(--c);background:rgba(11,13,18,.72);border-radius:4px;opacity:0;transition:opacity .4s;white-space:nowrap}
+#bbox{position:absolute;border:2px solid var(--st,#34C3D1);opacity:0;transition:opacity .3s,border-color .2s;box-shadow:0 0 24px -4px var(--st,#34C3D1)}
+#bbox span{position:absolute;left:-2px;bottom:100%;font:600 12px/1 var(--f-m);letter-spacing:.1em;padding:5px 8px;background:var(--st,#34C3D1);color:#0B0D12;white-space:nowrap}
+#deck{position:absolute;inset:0}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;justify-content:safe center;align-items:flex-start;padding:clamp(20px,5vw,84px);padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));pointer-events:none;opacity:0;visibility:hidden;transition:opacity .7s ease,visibility 0s .7s;box-sizing:border-box}
+.slide.on{opacity:1;visibility:visible;transition:opacity .7s ease .15s}
+.col{width:min(100%,640px);display:flex;flex-direction:column;gap:clamp(12px,2vh,22px)}
+.col.wide{width:min(100%,980px)}
+.eyebrow{font:500 clamp(11px,1.15vw,14px)/1.2 var(--f-m);letter-spacing:.22em;text-transform:uppercase;color:var(--blue);margin:0}
+.eyebrow.c{color:var(--coral)}.eyebrow.a{color:var(--amber)}.eyebrow.v{color:var(--violet)}.eyebrow.g{color:var(--green)}
+h1,h2,p{margin:0}
+h1{font:700 clamp(58px,11.5vw,176px)/.9 var(--f-d);letter-spacing:-.035em}
+h2{font:600 clamp(34px,5.2vw,84px)/1.02 var(--f-d);letter-spacing:-.025em;text-wrap:balance}
+.grad{color:var(--blue)}
+.lead{font-size:clamp(17px,1.65vw,24px);line-height:1.45;color:var(--mute);max-width:34em}
+.lead b{color:var(--ink);font-weight:600}
+.big{font:700 clamp(96px,19vw,290px)/.85 var(--f-d);letter-spacing:-.05em}
+.ph{font-family:var(--f-m);font-size:.82em;color:var(--amber);border-bottom:1px dashed rgba(242,184,75,.6);white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:10px 16px;font:500 clamp(12px,1.2vw,15px)/1.3 var(--f-m);color:var(--mute)}
+.src{font:400 clamp(11px,1vw,13px)/1.4 var(--f-m);color:rgba(139,147,167,.75)}
+.fine{font:400 clamp(12px,1.1vw,14px)/1.4 var(--f-m);color:var(--mute);letter-spacing:.04em}
+/* reveals */
+.r{opacity:0;clip-path:inset(-20% 100% -20% -5%);transform:translateY(18px)}
+.on .r:not([data-step]),.on .r.show{opacity:1;clip-path:inset(-20% -5% -20% -5%);transform:none;transition:opacity .5s cubic-bezier(.16,1,.3,1),clip-path .9s cubic-bezier(.16,1,.3,1),transform .9s cubic-bezier(.16,1,.3,1);transition-delay:calc(var(--d,0) * 110ms + 200ms)}
+.on .r.show[data-step]{transition-delay:60ms}
+.scan{position:relative}
+.scan::after{content:"";position:absolute;left:0;top:-4%;bottom:-4%;width:3px;background:var(--blue);box-shadow:0 0 18px var(--blue);opacity:0}
+.on .scan::after{animation:scan 1.1s cubic-bezier(.65,0,.35,1) .25s both}
+@keyframes scan{0%{left:0;opacity:1}90%{opacity:1}100%{left:100%;opacity:0}}
+/* people row */
+.folks{display:flex;gap:clamp(10px,2vw,22px);align-items:flex-end;height:clamp(44px,6vw,70px);margin:clamp(18px,2.2vw,28px) 0 clamp(6px,1vw,14px)}
+.big{font-size:clamp(72px,11vw,170px)}
+.tight .sig{padding:8px 0}
+.tight .tg{padding:8px 0}
+.tight .code{padding:9px 14px;line-height:1.45}
+.chips:not(.tree) span+span::before{content:"·";margin-right:16px;color:rgba(139,147,167,.6)}
+.col.tight{gap:10px}
+/* who is speaking */
+.spk{position:absolute;left:0;top:0;display:flex;gap:3px;align-items:flex-end;height:18px;padding:8px 10px;border-radius:12px;background:rgba(11,13,18,.72);border:1px solid var(--c);opacity:0;transition:opacity .3s;white-space:nowrap}
+.spk b{font:600 10px/18px var(--f-m);letter-spacing:.12em;text-transform:uppercase;color:var(--c);margin-right:6px}
+.spk i{width:4px;height:6px;background:var(--c);border-radius:2px;animation:spk .8s ease-in-out infinite}
+.spk i:nth-child(3){animation-delay:.15s}.spk i:nth-child(4){animation-delay:.3s}
+@keyframes spk{0%,100%{height:5px}50%{height:18px}}
+.pp{width:clamp(24px,3.6vw,46px);height:100%;transition:transform .8s cubic-bezier(.16,1,.3,1),background .4s;transform-origin:50% 100%;background:var(--mute);border-radius:50% 50% 8px 8px/30% 30% 8px 8px;position:relative;opacity:.85}
+.pp::before{content:"";position:absolute;left:50%;top:-30%;width:70%;aspect-ratio:1;border-radius:50%;background:inherit;transform:translateX(-50%)}
+.pp.tog{transform:rotate(-82deg) translateX(-14%);background:var(--coral);opacity:1;box-shadow:0 0 30px rgba(225,75,75,.5)}
+/* safety-question pills on the Talk slide */
+.tree span{padding:5px 10px;border:1px solid var(--line);border-radius:999px;transition:color .3s,border-color .3s,background .3s}
+.tree span+span::before{content:"→";position:absolute;margin-left:-19px;color:var(--line)}
+.tree{gap:10px 22px;position:relative}
+.tree span.hit{color:var(--blue);border-color:var(--blue)}
+.tree span.end.hit{color:#0B0D12;background:var(--blue)}
+/* signals */
+.sig{display:grid;grid-template-columns:1fr auto;gap:2px 16px;padding:12px 0;border-top:1px solid var(--line)}
+.sig b{font:600 clamp(16px,1.6vw,22px) var(--f-d)}
+.sig i{font:600 clamp(18px,1.8vw,26px) var(--f-m);font-style:normal;color:var(--blue);text-align:right;font-variant-numeric:tabular-nums}
+.sig span{grid-column:1/-1;font-size:clamp(13px,1.2vw,16px);color:var(--mute)}
+.sig.one{grid-template-columns:1fr}
+.sig b em{font:600 1.15em var(--f-m);font-style:normal;color:var(--blue)}
+.state{align-self:flex-start;font:700 clamp(12px,1.2vw,15px) var(--f-m);letter-spacing:.14em;padding:8px 12px;border-radius:4px;background:var(--st,#34C3D1);color:#0B0D12}
+/* chat */
+.bub{max-width:30em;padding:10px 14px;border-radius:16px;font-size:clamp(15px,1.35vw,19px);line-height:1.3;border:1.5px solid var(--bc);background:rgba(21,25,34,.82)}
+.bub small{display:block;font:600 11px var(--f-m);letter-spacing:.16em;text-transform:uppercase;color:var(--bc);margin-bottom:5px}
+.bub.g{--bc:var(--blue);border-bottom-left-radius:4px}
+.bub.m{--bc:var(--coral);border-bottom-right-radius:4px;align-self:flex-end}
+.chat{display:flex;flex-direction:column;gap:8px}
+/* photon thread mock + code block */
+.thread{margin:6px 0 8px;max-width:26em;padding:10px 14px;border-radius:14px;border-bottom-left-radius:4px;font-size:clamp(14px,1.25vw,18px);line-height:1.35;border:1.5px solid var(--green);background:rgba(21,25,34,.82);color:var(--ink)}
+.thread small{display:block;font:600 10px var(--f-m);letter-spacing:.14em;text-transform:uppercase;color:var(--green);margin-bottom:5px}
+.thread .btns{display:flex;gap:8px;margin-top:8px}
+.thread .btns span{font:600 12px/1 var(--f-m);letter-spacing:.06em;padding:7px 11px;border-radius:999px;border:1px solid var(--green);color:var(--green)}
+.code{font:500 clamp(12px,1.05vw,14px)/1.55 var(--f-m);color:var(--mute);background:rgba(21,25,34,.82);border:1px solid var(--line);border-radius:10px;padding:12px 16px;white-space:pre;margin:0;align-self:flex-start}
+.code b{color:var(--blue);font-weight:500}
+/* targets */
+.tg{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+.tg s{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 16px var(--c);margin-top:7px;flex:none}
+.tg b{display:block;font:600 clamp(17px,1.7vw,24px) var(--f-d)}
+.tg span{font-size:clamp(13px,1.25vw,17px);color:var(--mute)}
+/* nav */
+#nav{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));z-index:5}
+#nav button{all:unset;cursor:pointer;color:var(--mute);font:600 20px/1 var(--f-m);padding:8px 12px;border-radius:6px}
+#nav button:hover{color:var(--ink)}
+#nav button:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+#dots{display:flex;gap:6px;align-items:center}
+#dots button{padding:14px 0;width:clamp(16px,3.2vw,36px);border-radius:0;position:relative}
+#dots button::after{content:"";position:absolute;left:0;right:0;top:50%;height:4px;margin-top:-2px;background:rgba(139,147,167,.45);border-radius:2px;transition:background .3s,height .2s,margin-top .2s}
+#dots button:hover::after{background:var(--ink);height:6px;margin-top:-3px}
+#dots button::before{content:attr(data-n);position:absolute;left:50%;bottom:100%;transform:translate(-50%,2px);font:600 11px/1 var(--f-m);letter-spacing:.06em;color:var(--ink);background:rgba(11,13,18,.9);border:1px solid var(--line);padding:5px 7px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;white-space:nowrap}
+#dots button:hover::before{opacity:1;transform:translate(-50%,-4px)}
+#dots button.done::after{background:var(--violet)}
+#dots button.cur::after{background:linear-gradient(90deg,var(--blue),var(--coral));box-shadow:0 0 12px rgba(52,195,209,.6)}
+#count{font:500 12px var(--f-m);color:var(--mute);min-width:5ch;letter-spacing:.1em}
+.no3d #scrim{background:none}
+@media (max-width:760px),(max-aspect-ratio:1/1){
+ #scrim{background:linear-gradient(0deg,rgba(11,13,18,.94) 0%,rgba(11,13,18,.7) 42%,rgba(11,13,18,0) 72%)}
+ .slide{justify-content:flex-end}
+ #count{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+ .r,.on .r,.on .r.show{transition:none!important;transform:none}
+ .on .scan::after{animation:none}
+ .slide,.slide.on{transition:none}
+}
+</style>
+
+</head>
+<body>
+<div id="app">
+ <canvas id="gl" aria-hidden="true"></canvas>
+ <div id="scrim"></div><div id="grain"></div>
+ <div id="labels">
+  <div class="tag" style="--c:#34C3D1">Family · Photon</div>
+  <div class="tag" style="--c:#8FA3B8">Emergency contact</div>
+  <div class="tag" style="--c:#E14B4B">911 · relative calls</div>
+  <div class="spk" id="spkC" style="--c:#34C3D1"><b>Safety Net</b><i></i><i></i><i></i></div>
+  <div class="spk" id="spkM" style="--c:#E14B4B"><b>Margaret</b><i></i><i></i><i></i></div>
+ </div>
+ <div id="det"><div id="bbox"><span id="bl">WALKING</span></div></div>
+
+ <main id="deck">
+  <section class="slide" data-steps="0" aria-label="Safety Net">
+   <div class="col wide">
+        <h1 class="grad r scan" style="--d:1">Safety<br>Net</h1>
+    <p class="lead r" style="--d:3">How an AI saved a grandmother's afternoon.</p>
+    <div class="chips r" style="--d:4"><span>Hack for Humanity</span><span>San Francisco</span><span>19 September 2026</span><span>Team Safety Net</span></div>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="3" aria-label="The problem">
+   <div class="col tight">
+    <p class="eyebrow c r" style="--d:0">She is not unusual</p>
+    <div class="big grad r" style="--d:1">1 in 4</div>
+    <p class="lead r" style="--d:2"><b>older adults fall every year.</b> 36,000 of them die. In San Francisco, about <b>30%</b> of people over 65 live alone.</p>
+    <div class="folks r" style="--d:3" aria-hidden="true"><div class="pp"></div><div class="pp"></div><div class="pp"></div><div class="pp" data-tog="1"></div></div>
+    <div class="sig one r" data-step="1"><b><em>82%</em> of falls happen with nobody else home</b><span>and 30% of those who fell lay on the floor for an hour or more.</span></div>
+    <div class="sig one r" data-step="2"><b><em>97%</em> who owned a pendant alarm never pressed it</b><span>Most couldn't reach it. The device meant to help is the one thing they can't get to.</span></div>
+    <div class="sig one r" data-step="3"><b><em>43%</em> of real falls missed. Up to <em>85</em> false alarms a day.</b><span>Wearables ace staged lab falls. On real ones they miss 4 in 10 and cry wolf all day. Safety Net asks before it alerts anyone.</span></div>
+    <p class="src r" style="--d:4">Sources: CDC · SF DAS · Fleming &amp; Brayne, BMJ 2008 · Bagalà et al., PLOS ONE 2012</p>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="2" aria-label="Meet Margaret">
+   <div class="col">
+    <p class="eyebrow a r" style="--d:0">Tuesday afternoon &middot; San Francisco</p>
+    <h2 class="r scan" style="--d:1">Meet <span class="grad">Margaret.</span></h2>
+    <p class="lead r" style="--d:2">She lives on her own. She likes her tea strong and her kitchen quiet. Her window looks out toward the Golden Gate, and today a small camera is watching the room.</p>
+    <p class="lead r" data-step="1"><b>Safety Net is on.</b> Gemini Live is watching her, frame by frame.</p>
+    <p class="lead r" data-step="2">She is 81. Steady on her feet, mostly. And like a lot of people her age in this city, <b>alone from breakfast to bedtime.</b></p>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="2" aria-label="The fall">
+   <div class="col">
+    <p class="eyebrow a r" style="--d:0">Later that week</p>
+    <h2 class="r scan" style="--d:1">The kettle <span class="grad">whistles.</span></h2>
+    <p class="lead r" style="--d:2">Margaret turns to reach it. Nobody else is home.</p>
+    <p class="lead r" data-step="1"><b>Her shoe catches the folded edge of the rug.</b></p>
+    <p class="lead r" data-step="2">Nobody is there to see it. Except the camera.</p>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="3" aria-label="Detect">
+   <div class="col">
+    <p class="eyebrow r" style="--d:0">Step 1 · See</p>
+    <h2 class="r scan" style="--d:1">Gemini Live sees the <span class="grad">fall.</span></h2>
+    <p class="lead r" style="--d:2">It watches the video and turns her pose into three numbers we can track, live.</p>
+    <div class="state r" id="state" style="--d:3">WALKING</div>
+    <div>
+     <div class="sig r" data-step="1"><b>Torso angle</b><i id="vAngle">0°</i><span>From upright. A body on the floor is near 90°.</span></div>
+     <div class="sig r" data-step="2"><b>Hip height</b><i id="vHip">100%</i><span>Compared with standing. Hips drop fast in a fall.</span></div>
+     <div class="sig r" data-step="3"><b>Box shape</b><i id="vBox">0.4</i><span>Width over height. Standing is tall, fallen is wide.</span></div>
+    </div>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="5" aria-label="Talk">
+   <div class="col tight">
+    <p class="eyebrow v r" style="--d:0">Step 2 · Talk</p>
+    <h2 class="r scan" style="--d:1">A calm voice <span class="grad">speaks first.</span></h2>
+    <p class="src r" style="--d:2">Gemini Live API hears her and answers in real time. The safety questions below are its system prompt.</p>
+    <div class="chips tree r" style="--d:2" aria-label="Safety questions"><span data-hit="1">Hear me?</span><span data-hit="3">Head?</span><span data-hit="3">Hip?</span><span data-hit="3">Can you move?</span><span data-hit="5" class="end">Stay down</span></div>
+    <div class="chat">
+     <div class="bub g r" data-step="1"><small>Safety Net · Gemini Live</small>Margaret, I think you fell. Don't try to stand yet. Can you hear me?</div>
+     <div class="bub m r" data-step="2"><small>Margaret</small>Yes… I'm here.</div>
+     <div class="bub g r" data-step="3"><small>Safety Net · Gemini Live</small>Good. Did you hit your head? Does your hip hurt? Can you move your legs?</div>
+     <div class="bub m r" data-step="4"><small>Margaret</small>Not my head. My hip hurts, and I can't get up.</div>
+     <div class="bub g r" data-step="5"><small>Safety Net · Gemini Live</small>Then stay down. I'm calling your daughter now, and I'll stay with you.</div>
+    </div>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="3" aria-label="Alert">
+   <div class="col">
+    <p class="eyebrow c r" style="--d:0">Step 3 · Act</p>
+    <h2 class="r scan" style="--d:1">Family first. <span class="grad">911 last.</span></h2>
+    <div>
+     <div class="tg r" data-step="1" style="--c:#34C3D1"><s></s><div><b>Family</b>
+      <div class="thread"><small>Safety Net → Sarah · via Photon on iMessage</small>Mum fell in the kitchen at 3:42 PM, 4 min ago. Awake. Hip pain. Can't get up. I'm with her.<br>📍 1420 Hyde St, Apt 3<div class="btns"><span>Talk to Mum</span><span>I'm calling 911</span></div></div>
+      <span>One tap puts Sarah on the room speaker. Photon runs the thread on whatever app she already uses.</span></div></div>
+     <div class="tg r" data-step="2" style="--c:#8FA3B8"><s></s><div><b>Emergency contact</b><span>If nobody answers, the designated contact is phoned. A call, so a person picks up.</span></div></div>
+     <div class="tg r" data-step="3" style="--c:#E14B4B"><s></s><div><b>911</b><span>If it looks severe or nobody answers: the person on the line is told to call 911 at 1420 Hyde St, Apt 3. Safety Net never pretends to be 911.</span></div></div>
+    </div>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="0" aria-label="Rescue">
+   <div class="col">
+    <p class="eyebrow g r" style="--d:0">Soon after</p>
+    <h2 class="r scan" style="--d:1">Help is <span class="grad">on its way.</span></h2>
+    <p class="lead r" style="--d:2">Her daughter's phone lights up. She calls 911 with the address. A siren echoes up the hill.</p>
+    <p class="lead r" style="--d:3"><b>Margaret is not alone on that floor.</b></p>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="4" aria-label="How it works">
+   <div class="col tight">
+    <p class="eyebrow v r" style="--d:0">How it works</p>
+    <h2 class="r scan" style="--d:1">Three pieces, <span class="grad">one loop.</span></h2>
+    <div>
+     <div class="tg r" data-step="1" style="--c:#34C3D1"><s></s><div><b>A camera already in the room</b><span>Aimed at the floor, with a speaker. Streams video and audio. No wearable.</span></div></div>
+     <div class="tg r" data-step="2" style="--c:#8FA3B8"><s></s><div><b>Gemini Live API</b><span>Watches the stream, spots the fall, speaks first and runs through the safety questions: head, hip, can you move. Returns one structured event.</span></div></div>
+     <div class="tg r" data-step="3" style="--c:#34C3D1"><s></s><div><b>Photon</b><span>Sends the briefing to the daughter on iMessage, relays her replies, puts her on the room speaker.</span></div></div>
+     <div class="tg r" data-step="4" style="--c:#E14B4B"><s></s><div><b>Escalation</b><span>Emergency contact phoned if nobody answers. The person on the line is told to call 911 at the address. Safety Net never dials 911 itself.</span></div></div>
+    </div>
+    <pre class="code r" data-step="2">{ <b>"event"</b>: "fall", <b>"responsive"</b>: true, <b>"head"</b>: false, <b>"hip"</b>: true,
+  <b>"can_move"</b>: false, <b>"action"</b>: "stay_down", <b>"notify"</b>: ["daughter"] }</pre>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="4" aria-label="Live demo">
+   <div class="col">
+    <p class="eyebrow a r" style="--d:0">Live demo</p>
+    <h2 class="r scan" style="--d:1">Now, <span class="grad">for real.</span></h2>
+    <p class="lead r" style="--d:2">Real camera, real messages, no script.</p>
+    <div>
+     <div class="tg r" data-step="1" style="--c:#F2B84B"><s></s><div><b>1 · A fall in front of the camera</b></div></div>
+     <div class="tg r" data-step="2" style="--c:#34C3D1"><s></s><div><b>2 · The briefing lands in iMessage, live on this screen</b></div></div>
+     <div class="tg r" data-step="3" style="--c:#8FA3B8"><s></s><div><b>3 · Gemini Live speaks first and asks the safety questions</b></div></div>
+     <div class="tg r" data-step="4" style="--c:#34C3D1"><s></s><div><b>4 · We answer it. The family replies from iMessage.</b></div></div>
+    </div>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="0" aria-label="Impact">
+   <div class="col tight">
+    <p class="eyebrow g r" style="--d:0">Why San Francisco</p>
+    <h2 class="r scan" style="--d:1">Minutes on the floor, <span class="grad">not hours.</span></h2>
+    <div>
+     <div class="sig one r" style="--d:2"><b><em>4 hours</em> on the floor, in a home wired with sensors</b><span>A Maui field study: motion sensors, a remote alert chain, security cameras. The fall was found by a visiting daughter. Detection without a conversation was not enough.</span></div>
+     <div class="sig one r" style="--d:3"><b><em>1 in 5</em> who fall stay on the floor over an hour</b><span>With Safety Net, family knows in under a minute and 911 gets a name and an address.</span></div>
+     <div class="sig one r" style="--d:4"><b><em>$50 billion</em> a year, 3 million ER visits</b><span>What falls in older adults cost the US in 2020, most of it paid by Medicare and Medicaid.</span></div>
+     <div class="sig one r" style="--d:5"><b><em>$0</em> in new hardware</b><span>A camera with a speaker, already in the room. No wearable, no subscription.</span></div>
+    </div>
+    <p class="src r" style="--d:6">Sources: Dr Lorrin Pang, Maui District Health Officer, Hawaii Dept of Health, 2024 · CDC · University of Sheffield, Long Lies Study</p>
+   </div>
+  </section>
+
+  <section class="slide" data-steps="0" aria-label="Close">
+   <div class="col wide">
+    <p class="eyebrow g r" style="--d:0">Safety Net</p>
+    <h1 class="grad r scan" style="--d:1">Nobody<br>Falls Alone.</h1>
+    <p class="lead r" style="--d:3">Margaret's story is fiction. The problem is not.</p>
+    <div class="chips r" style="--d:4"><span class="ph">[GitHub link]</span><span>Team Safety Net</span><span>Hack for Humanity</span><span>San Francisco</span></div>
+   </div>
+  </section>
+ </main>
+
+ <nav id="nav" aria-label="Slide navigation"><button id="prev" aria-label="Previous">&#8249;</button><div id="dots"></div><button id="next" aria-label="Next">&#8250;</button><span id="count"></span></nav>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function pad2(n){return (n<10?'0':'')+n}
+var slides=$$('.slide'),N=slides.length,cur=0,step=0;
+var maxSteps=slides.map(function(s){return +s.dataset.steps||0});
+var dots=$('#dots');
+slides.forEach(function(s,i){var b=document.createElement('button');b.setAttribute('aria-label','Go to slide '+(i+1));b.dataset.n=(i+1)+' · '+(s.getAttribute('aria-label')||'');b.onclick=function(e){e.stopPropagation();go(i,0)};dots.appendChild(b)});
+
+function apply(){
+ slides.forEach(function(s,i){
+  s.classList.toggle('on',i===cur);
+  $$('[data-step]',s).forEach(function(el){el.classList.toggle('show',i===cur&&+el.dataset.step<=step)});
+  $$('[data-tog]',s).forEach(function(el){el.classList.toggle('tog',i===cur&&+el.dataset.tog<=step)});
+  $$('[data-hit]',s).forEach(function(el){el.classList.toggle('hit',i===cur&&+el.dataset.hit<=step)});
+ });
+ $$('button',dots).forEach(function(b,i){b.className=i===cur?'cur':(i<cur?'done':'')});
+ $('#count').textContent=pad2(cur+1)+' / '+pad2(N);
+ try{history.replaceState(null,'','#'+(cur+1))}catch(e){}
+}
+var replayReq=false;   /* set when the See slide is entered or R is pressed; the 3D loop decides whether to replay */
+function go(i,s){i=Math.max(0,Math.min(N-1,i));if(i===4&&i!==cur)replayReq=true;cur=i;step=s||0;apply()}
+function next(){if(step<maxSteps[cur])step++,apply();else if(cur<N-1)go(cur+1,0)}
+function prev(){if(step>0)step--,apply();else if(cur>0)go(cur-1,maxSteps[cur-1])}
+$('#next').onclick=function(e){e.stopPropagation();next()};
+$('#prev').onclick=function(e){e.stopPropagation();prev()};
+addEventListener('keydown',function(e){
+ var k=e.key;
+ if(k==='ArrowRight'||k==='ArrowDown'||k===' '||k==='PageDown'||k==='Enter'){e.preventDefault();next()}
+ else if(k==='ArrowLeft'||k==='ArrowUp'||k==='PageUp'||k==='Backspace'){e.preventDefault();prev()}
+ else if(k==='Home')go(0,0);else if(k==='End')go(N-1,0);
+ else if(k>='1'&&k<='9'&&+k<=N)go(+k-1,0);else if(k==='0'&&N>=10)go(9,0);
+ else if(k==='f'&&document.documentElement.requestFullscreen){document.documentElement.requestFullscreen()}
+ else if(k==='r')replayReq=true;
+});
+var tx=null;
+addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});
+addEventListener('touchend',function(e){if(tx===null)return;var dx=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(dx)>50){e.preventDefault&&0;dx<0?next():prev()}},{passive:true});
+function fromHash(){var n=parseInt(location.hash.slice(1),10);if(n>=1&&n<=N)go(n-1,0);else apply()}
+addEventListener('hashchange',function(){var n=parseInt(location.hash.slice(1),10);if(n-1!==cur&&n>=1&&n<=N)go(n-1,0)});
+fromHash();
+
+/* ---------------- 3D stage ---------------- */
+if(!window.THREE){document.body.classList.add('no3d');return}
+var cv=$('#gl'),renderer;
+try{renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true})}catch(e){document.body.classList.add('no3d');return}
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.localClippingEnabled=true;
+cv.addEventListener('webglcontextlost',function(e){e.preventDefault()});
+var scene=new THREE.Scene();
+var NIGHT=new THREE.Color(0x0B0D12);
+scene.background=NIGHT;scene.fog=new THREE.Fog(0x0B0D12,11,26);
+var cam=new THREE.PerspectiveCamera(42,1,.1,60);
+
+scene.add(new THREE.HemisphereLight(0xC8B8A8,0x1F1A17,.85));
+var dl=new THREE.DirectionalLight(0xcfdcff,.8);dl.position.set(3,6,5);scene.add(dl);
+var warm=new THREE.PointLight(0xFFC48E,1.3,9);warm.position.set(1.6,2.4,-2.4);scene.add(warm);
+var pink=new THREE.PointLight(0x34C3D1,.35,8);pink.position.set(3.5,1.5,1.5);scene.add(pink);
+
+var clip=new THREE.Plane(new THREE.Vector3(-1,0,0),0);
+var roomG=new THREE.Group();scene.add(roomG);
+var edgeMat=new THREE.LineBasicMaterial({color:0x8A7A6A,transparent:true,opacity:.35});
+var solids=[];
+function addMesh(g,col,x,y,z,ry,emis){
+ var m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color:col,roughness:.9,metalness:0,clippingPlanes:[clip],side:THREE.DoubleSide,emissive:emis||0x000000,emissiveIntensity:emis?.5:0}));
+ m.position.set(x,y,z);m.rotation.y=ry||0;roomG.add(m);
+ m.add(new THREE.LineSegments(new THREE.EdgesGeometry(g,30),edgeMat));
+ solids.push(m);return m;
+}
+function box(w,h,d,x,y,z,c,ry,em){return addMesh(new THREE.BoxGeometry(w,h,d),c,x,y,z,ry,em)}
+function cyl(r1,r2,h,x,y,z,c,seg){return addMesh(new THREE.CylinderGeometry(r1,r2,h,seg||16),c,x,y,z,0)}
+box(9,.1,6.6,0,-.05,-.1,0x1F1A17);
+box(5.3,3.2,.12,-1.85,1.6,-3.2,0x2B2622);box(2.1,3.2,.12,3.45,1.6,-3.2,0x2B2622);
+box(1.6,1.35,.12,1.6,.675,-3.2,0x2B2622);box(1.6,.75,.12,1.6,2.825,-3.2,0x2B2622);
+box(.05,1.1,.06,1.6,1.9,-3.2,0x5A4A3C);
+box(.12,3.2,6.6,-4.5,1.6,-.1,0x272220);
+/* the view from the window: a Golden Gate style bridge in the fog */
+(function(){
+ var g=new THREE.Group();g.position.set(0,0,-7);scene.add(g);
+ var mo=new THREE.MeshBasicMaterial({color:0x8C3A30}),lo=new THREE.LineBasicMaterial({color:0xA8483C});
+ function bx(w,h,d,x,y){var m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mo);m.position.set(x,y,0);g.add(m)}
+ bx(14,.12,.5,1.5,1.25);
+ [2.0,2.5].forEach(function(x){bx(.16,3.3,.16,x,1.65)});
+ bx(.7,.1,.16,2.25,2.6);bx(.7,.1,.16,2.25,3.2);
+ var pts=[];for(var i=0;i<=24;i++){var t=i/24,x=-4.5+t*13.5;pts.push(new THREE.Vector3(x,1.25+Math.pow(Math.abs(x-2.25)/6.75,2)*3.35*(x<2.25?1:1)-0,0))}
+ var cp=[];for(var i=0;i<=30;i++){var x=-5+i*(14/30),u=(x-2.25)/7.25;cp.push(new THREE.Vector3(x,Math.min(3.3,1.4+3.0*u*u),0))}
+ g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(cp),lo));
+ for(var i=0;i<=30;i+=2){var p=cp[i];if(p.y>1.3&&p.y<3.25)g.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([p,new THREE.Vector3(p.x,1.3,0)]),new THREE.LineBasicMaterial({color:0x5A2620})))}
+ var fog=new THREE.Mesh(new THREE.PlaneGeometry(30,1.2),new THREE.MeshBasicMaterial({color:0x8FA3B8,transparent:true,opacity:.14,depthWrite:false}));fog.position.set(0,1.0,.6);g.add(fog);
+})();
+box(3.4,.9,.75,-2.4,.45,-2.75,0x4A3A2E);
+box(3.5,.06,.85,-2.4,.93,-2.72,0x5A4A3C);
+box(3,.8,.4,-2.4,2.2,-3.0,0x3D3129);
+cyl(.14,.16,.24,-2.9,1.08,-2.7,0xEFE4D2);
+cyl(.03,.03,.16,-2.72,1.14,-2.7,0xEFE4D2,8).rotation.z=1.2;
+box(.95,2,.8,3.6,1,-2.75,0x3A3532);
+box(1.7,.06,1,2.4,.76,-.9,0x5A4A3C);
+[[-.75,-.42],[.75,-.42],[-.75,.42],[.75,.42]].forEach(function(p){box(.06,.76,.06,2.4+p[0],.38,-.9+p[1],0x4A3A2E)});
+box(.45,.05,.45,1.4,.45,-.9,0x55443A);box(.05,.5,.45,1.2,.72,-.9,0x55443A);
+box(.45,.05,.45,3.4,.45,-.9,0x55443A);box(.05,.5,.45,3.6,.72,-.9,0x55443A);
+[1.4,3.4].forEach(function(cx){[[-.19,-.19],[.19,-.19],[-.19,.19],[.19,.19]].forEach(function(p){box(.04,.45,.04,cx+p[0],.225,-.9+p[1],0x4A3A2E)})});
+box(2.6,.03,1.7,.5,.015,.3,0x7A5648);
+/* the folded rug corner she trips on, at the rug's near edge */
+var curl=box(.4,.05,.5,1.7,.07,.15,0x7A5648);curl.rotation.z=.35;
+cyl(.2,.15,.35,3.9,.18,1.6,0x5A4A3C);
+[[0,.7,0],[.12,.55,.05],[-.1,.6,-.05]].forEach(function(p){var l=addMesh(new THREE.SphereGeometry(.2,10,8),0x4E7A52,3.9+p[0],p[1],1.6+p[2],0);l.scale.y=1.3});
+box(.7,.5,.04,-.9,2.0,-3.12,0x8C6A4E);box(.5,.7,.04,-.1,2.1,-3.12,0x6E8A7A);
+/* camera device */
+var camDev=new THREE.Group();camDev.position.set(.5,2.55,-3.0);scene.add(camDev);
+camDev.add(new THREE.Mesh(new THREE.BoxGeometry(.34,.2,.2),new THREE.MeshStandardMaterial({color:0xEFE4D2,roughness:.4})));
+var lens=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.06,12),new THREE.MeshBasicMaterial({color:0x0A0E1F}));lens.rotation.x=Math.PI/2;lens.position.z=.12;camDev.add(lens);
+var led=new THREE.Mesh(new THREE.SphereGeometry(.025,8,8),new THREE.MeshBasicMaterial({color:0xE14B4B}));led.position.set(.12,.06,.1);camDev.add(led);
+var coneG=new THREE.ConeGeometry(1.7,4.6,36,1,true);coneG.translate(0,-2.3,0);coneG.rotateX(-Math.PI/2);
+var coneM=new THREE.MeshBasicMaterial({color:0x34C3D1,transparent:true,opacity:0,blending:THREE.AdditiveBlending,depthWrite:false,side:THREE.DoubleSide});
+var cone=new THREE.Mesh(coneG,coneM);camDev.add(cone);
+camDev.lookAt(1.0,0,.1);
+/* kettle steam: a few soft sprites that rise and fade while the kettle whistles */
+var steam=[];for(var si=0;si<7;si++){var sm=new THREE.Sprite(new THREE.SpriteMaterial({map:dotTex(),transparent:true,opacity:0,depthWrite:false,color:0xEFE4D2}));sm.userData.ph=si/7;scene.add(sm);steam.push(sm)}
+var steamOn=0;
+
+/* stipple points sampled from the room surfaces */
+(function(){
+ var a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),ab=new THREE.Vector3(),ac=new THREE.Vector3(),nn=new THREE.Vector3();
+ var items=[],total=0;
+ solids.forEach(function(m){
+  m.updateWorldMatrix(true,false);
+  var g=m.geometry.index?m.geometry.toNonIndexed():m.geometry,p=g.attributes.position,T=p.count/3,cum=[],tot=0;
+  for(var i=0;i<T;i++){
+   a.fromBufferAttribute(p,i*3).applyMatrix4(m.matrixWorld);b.fromBufferAttribute(p,i*3+1).applyMatrix4(m.matrixWorld);c.fromBufferAttribute(p,i*3+2).applyMatrix4(m.matrixWorld);
+   ab.subVectors(b,a);ac.subVectors(c,a);nn.crossVectors(ab,ac);var ar=nn.length()*.5;
+   if(nn.y/(nn.length()||1)<-.5)ar=0;
+   tot+=ar;cum.push(tot);
+  }
+  items.push({m:m,p:p,T:T,cum:cum,tot:tot});total+=tot;
+ });
+ var D=Math.min(230,52000/total),pos=[],seed=[];
+ items.forEach(function(it){
+  var n=Math.round(it.tot*D),m=it.m;
+  for(var k=0;k<n;k++){
+   var r=Math.random()*it.tot,lo=0,hi=it.T-1;
+   while(lo<hi){var mid=(lo+hi)>>1;if(it.cum[mid]<r)lo=mid+1;else hi=mid}
+   a.fromBufferAttribute(it.p,lo*3).applyMatrix4(m.matrixWorld);b.fromBufferAttribute(it.p,lo*3+1).applyMatrix4(m.matrixWorld);c.fromBufferAttribute(it.p,lo*3+2).applyMatrix4(m.matrixWorld);
+   var u=Math.random(),v=Math.random();if(u+v>1){u=1-u;v=1-v}
+   pos.push(a.x+(b.x-a.x)*u+(c.x-a.x)*v,a.y+(b.y-a.y)*u+(c.y-a.y)*v,a.z+(b.z-a.z)*u+(c.z-a.z)*v);seed.push(Math.random());
+  }
+ });
+ for(var d=0;d<900;d++){pos.push(-4.4+Math.random()*8.8,Math.random()*3,-3+Math.random()*6);seed.push(Math.random())}
+ var g=new THREE.BufferGeometry();
+ g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+ g.setAttribute('aSeed',new THREE.Float32BufferAttribute(seed,1));
+ window.__stip=g;
+})();
+var U={uReveal:{value:1},uSolid:{value:-2},uScale:{value:500},uSize:{value:.028},uTime:{value:0},
+ uC1:{value:new THREE.Color(0xEFE4D2)},uC2:{value:new THREE.Color(0xC9A98A)},uC3:{value:new THREE.Color(0x34C3D1)},uFlash:{value:new THREE.Color(0xF2B84B)}};
+var pts=new THREE.Points(window.__stip,new THREE.ShaderMaterial({uniforms:U,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+ vertexShader:'attribute float aSeed;uniform float uReveal,uSolid,uScale,uSize,uTime;varying float vA,vF,vS;'+
+ 'void main(){vec3 p=position;float shown=clamp((uReveal-p.x)/.9,0.,1.);float sol=clamp((uSolid-p.x)/.9,0.,1.);'+
+ 'float f=smoothstep(0.,.25,shown)*(1.-smoothstep(.25,1.,shown));float fs=sol*(1.-sol)*4.;'+
+ 'vF=max(f,fs)*.6;vA=shown*(1.-sol);vS=aSeed;'+
+ 'p.y+=(1.-shown)*(.3+aSeed*.7);p.y+=sin(uTime*.7+aSeed*40.)*.006;p.x+=cos(uTime*.5+aSeed*23.)*.004;'+
+ 'vec4 mv=modelViewMatrix*vec4(p,1.);gl_Position=projectionMatrix*mv;gl_PointSize=uSize*uScale/(-mv.z)*(1.+vF*.8);}',
+ fragmentShader:'precision mediump float;varying float vA,vF,vS;uniform vec3 uC1,uC2,uC3,uFlash;'+
+ 'void main(){vec2 d=gl_PointCoord-.5;float r=length(d);if(r>.5||vA<.01)discard;float soft=smoothstep(.5,.15,r);'+
+ 'vec3 b=mix(uC1,uC2,step(.62,vS));b=mix(b,uC3,step(.9,vS));vec3 c=mix(b,uFlash,clamp(vF*1.4,0.,1.));'+
+ 'gl_FragColor=vec4(c,vA*soft*.9);}'}));
+pts.frustumCulled=false;scene.add(pts);
+
+/* light bars at the sweep fronts */
+function gradTex(col){var c=document.createElement('canvas');c.width=64;c.height=256;var x=c.getContext('2d');
+ var g=x.createLinearGradient(0,0,64,0);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.5,col);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,64,256);
+ x.globalCompositeOperation='destination-in';var v=x.createLinearGradient(0,0,0,256);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(.25,'#000');v.addColorStop(.75,'#000');v.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=v;x.fillRect(0,0,64,256);
+ return new THREE.CanvasTexture(c)}
+function bar(col){var s=new THREE.Sprite(new THREE.SpriteMaterial({map:gradTex(col),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0}));s.scale.set(.9,6,1);scene.add(s);return s}
+var barSolid=bar('rgba(52,195,209,.85)'),barReveal=bar('rgba(143,163,184,.8)');
+
+/* ---- Margaret ---- */
+function mat(c,e){return new THREE.MeshStandardMaterial({color:c,roughness:.7,metalness:.05,emissive:c,emissiveIntensity:e||.14})}
+var M={skin:mat(0xE3C2A6,.08),hair:mat(0xE0DAD2,.2),cardi:mat(0x8A7F73,.16),dress:mat(0x4A3F44,.16),tights:mat(0xA89E96,.12),shoe:mat(0xEFE4D2,.15),glass:new THREE.MeshBasicMaterial({color:0x0A0E1F}),lip:mat(0xB8786C,.1)};
+M.hair.side=THREE.DoubleSide;
+function seg(len,r1,r2,m){var g=new THREE.CylinderGeometry(r1,r2,len,12);g.translate(0,-len/2,0);return new THREE.Mesh(g,m)}
+function ball(r,m){return new THREE.Mesh(new THREE.SphereGeometry(r,14,10),m)}
+function lerp(a,b,t){return a+(b-a)*t}
+var HIPY=.92;                       /* hip height when standing (fig-local units) */
+var RD=-1;                          /* which side she rolls onto: -1 = her left, toward the rug */
+var fig=new THREE.Group();fig.scale.setScalar(.95);scene.add(fig);
+var tilt=new THREE.Group();tilt.position.y=HIPY;fig.add(tilt);   /* pivot sits at the hips, not the feet */
+var hips=new THREE.Group();tilt.add(hips);
+var skirtG=new THREE.CylinderGeometry(.16,.29,.5,18);skirtG.translate(0,-.2,0);
+var skirt=new THREE.Mesh(skirtG,M.dress);hips.add(skirt);
+var torso=new THREE.Group();hips.add(torso);
+var body=new THREE.Mesh(new THREE.CylinderGeometry(.19,.16,.52,16),M.cardi);body.position.y=.28;torso.add(body);
+/* head: neck stalk, oval face, hair as a cap plus a back piece, eyes, glasses, mouth */
+var neck=new THREE.Group();neck.position.y=.54;torso.add(neck);
+var nk=new THREE.Mesh(new THREE.CylinderGeometry(.04,.045,.11,10),M.skin);nk.position.y=.04;neck.add(nk);
+var head=ball(.11,M.skin);head.scale.y=1.08;head.position.y=.19;neck.add(head);
+var hc=new THREE.Group();hc.position.y=.19;neck.add(hc);
+var capT=new THREE.Mesh(new THREE.SphereGeometry(.12,16,10,0,Math.PI*2,0,Math.PI*.42),M.hair);capT.position.y=.015;hc.add(capT);
+var capB=new THREE.Mesh(new THREE.SphereGeometry(.12,16,10,Math.PI,Math.PI,0,Math.PI*.78),M.hair);capB.position.set(0,.01,-.01);hc.add(capB);
+var bun=ball(.05,M.hair);bun.position.set(0,.1,-.1);hc.add(bun);
+[-1,1].forEach(function(s){
+ var eye=ball(.013,M.glass);eye.position.set(s*.04,.015,.1);hc.add(eye);
+ var ring=new THREE.Mesh(new THREE.TorusGeometry(.03,.004,6,16),M.glass);ring.position.set(s*.042,.015,.112);hc.add(ring);
+});
+var bridge=new THREE.Mesh(new THREE.BoxGeometry(.024,.004,.004),M.glass);bridge.position.set(0,.02,.112);hc.add(bridge);
+var mouth=new THREE.Mesh(new THREE.BoxGeometry(.035,.006,.008),M.lip);mouth.position.set(0,-.05,.1);hc.add(mouth);
+function arm(s){
+ var sh=new THREE.Group();sh.position.set(s*.245,.5,0);torso.add(sh);
+ sh.add(ball(.055,M.cardi));
+ sh.add(seg(.3,.05,.04,M.cardi));
+ var el=new THREE.Group();el.position.y=-.3;sh.add(el);el.add(seg(.27,.04,.035,M.cardi));
+ var hd=ball(.045,M.skin);hd.scale.set(1,1.15,.75);hd.position.y=-.28;el.add(hd);
+ return {sh:sh,el:el,hd:hd};
+}
+function leg(s){
+ var hp=new THREE.Group();hp.position.set(s*.09,0,0);hips.add(hp);hp.add(seg(.44,.075,.05,M.tights));
+ var kn=new THREE.Group();kn.position.y=-.44;hp.add(kn);kn.add(seg(.44,.05,.04,M.tights));
+ var an=new THREE.Group();an.position.y=-.44;kn.add(an);
+ var sh=new THREE.Mesh(new THREE.BoxGeometry(.09,.06,.22),M.shoe);sh.position.set(0,-.02,.05);an.add(sh);
+ return {hp:hp,kn:kn,an:an};
+}
+var AL=arm(-1),AR=arm(1),LL=leg(-1),LR=leg(1);
+var cane=new THREE.Group();fig.add(cane);
+var cm=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.82,8),M.shoe);cm.position.y=.41;cane.add(cm);
+var hook=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.14,8),M.shoe);hook.rotation.z=Math.PI/2;hook.position.set(.05,.82,0);cane.add(hook);
+/* soft contact shadow so she reads as standing on the floor */
+var shadow=(function(){var c=document.createElement('canvas');c.width=c.height=128;var x=c.getContext('2d');
+ var g=x.createRadialGradient(64,64,0,64,64,64);g.addColorStop(0,'rgba(0,0,0,.75)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,128,128);
+ var m=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+ m.rotation.x=-Math.PI/2;m.position.y=.008;scene.add(m);return m})();
+
+/* skeleton overlay */
+var JT=[head,neck,AL.sh,AR.sh,AL.el,AR.el,AL.hd,AR.hd,LL.hp,LR.hp,LL.kn,LR.kn,LL.an,LR.an];
+var BONES=[[0,1],[2,3],[1,2],[1,3],[2,4],[4,6],[3,5],[5,7],[2,8],[3,9],[8,9],[8,10],[10,12],[9,11],[11,13]];
+var skPos=new Float32Array(BONES.length*6),skG=new THREE.BufferGeometry();
+skG.setAttribute('position',new THREE.BufferAttribute(skPos,3));
+var skM=new THREE.LineBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthTest:false});
+var sk=new THREE.LineSegments(skG,skM);sk.frustumCulled=false;sk.renderOrder=10;scene.add(sk);
+function dotTex(){var c=document.createElement('canvas');c.width=c.height=64;var x=c.getContext('2d');x.fillStyle='#fff';x.beginPath();x.arc(32,32,26,0,7);x.fill();return new THREE.CanvasTexture(c)}
+var kpG=new THREE.BufferGeometry();var kpPos=new Float32Array(JT.length*3);kpG.setAttribute('position',new THREE.BufferAttribute(kpPos,3));
+var kpM=new THREE.PointsMaterial({size:11,sizeAttenuation:false,map:dotTex(),transparent:true,opacity:0,depthTest:false,color:0x34C3D1,alphaTest:.3});
+var kp=new THREE.Points(kpG,kpM);kp.frustumCulled=false;kp.renderOrder=11;scene.add(kp);
+
+/* the net */
+var NG=20,NX0=-2.6,NX1=3.4,NZ0=-1.5,NZ1=2.2;
+var netN=(NG*(NG-1))*2,netPos=new Float32Array(netN*2*3),netCol=new Float32Array(netN*2*3);
+var netG=new THREE.BufferGeometry();netG.setAttribute('position',new THREE.BufferAttribute(netPos,3));netG.setAttribute('color',new THREE.BufferAttribute(netCol,3));
+var netM=new THREE.LineBasicMaterial({vertexColors:true,transparent:true,opacity:.9,blending:THREE.AdditiveBlending,depthWrite:false});
+var net=new THREE.LineSegments(netG,netM);net.frustumCulled=false;scene.add(net);
+var netTint=new THREE.Color(0x34C3D1);
+
+/* Gemini star */
+var star=(function(){var c=document.createElement('canvas');c.width=c.height=256;var x=c.getContext('2d');
+ var rg=x.createRadialGradient(128,128,0,128,128,128);rg.addColorStop(0,'rgba(52,195,209,.4)');rg.addColorStop(1,'rgba(52,195,209,0)');x.fillStyle=rg;x.fillRect(0,0,256,256);
+ var g=x.createLinearGradient(20,20,236,236);g.addColorStop(0,'#34C3D1');g.addColorStop(.55,'#8FA3B8');g.addColorStop(1,'#EEF1F5');x.fillStyle=g;
+ x.beginPath();x.moveTo(128,14);x.quadraticCurveTo(128,128,242,128);x.quadraticCurveTo(128,128,128,242);x.quadraticCurveTo(128,128,14,128);x.quadraticCurveTo(128,128,128,14);x.fill();
+ var s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity:0}));s.scale.setScalar(.01);scene.add(s);return s})();
+
+/* alert network */
+var NODES=[{c:0x34C3D1,p:new THREE.Vector3(-1.4,3.0,0)},{c:0x8FA3B8,p:new THREE.Vector3(1.0,3.2,-.6)},{c:0xE14B4B,p:new THREE.Vector3(3.0,2.7,0)}];
+NODES.forEach(function(n){
+ var g=new THREE.Group();g.position.copy(n.p);scene.add(g);n.g=g;
+ g.add(new THREE.Mesh(new THREE.SphereGeometry(.24,16,12),new THREE.MeshBasicMaterial({color:n.c})));
+ n.w=new THREE.Mesh(new THREE.IcosahedronGeometry(.5,1),new THREE.MeshBasicMaterial({color:n.c,wireframe:true,transparent:true,opacity:.6}));g.add(n.w);
+ var ring=new THREE.Mesh(new THREE.TorusGeometry(.72,.012,6,48),new THREE.MeshBasicMaterial({color:n.c}));ring.rotation.x=1.2;g.add(ring);n.ring=ring;
+ var lg=new THREE.BufferGeometry();lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(6),3));
+ n.line=new THREE.Line(lg,new THREE.LineBasicMaterial({color:n.c,transparent:true,opacity:0,blending:THREE.AdditiveBlending}));n.line.frustumCulled=false;scene.add(n.line);
+ n.pulse=new THREE.Mesh(new THREE.SphereGeometry(.08,10,8),new THREE.MeshBasicMaterial({color:0xffffff}));scene.add(n.pulse);
+ n.a=0;
+});
+var tags=$$('.tag'),spkC=$('#spkC'),spkM=$('#spkM');
+
+/* ---- shots and levels ---- */
+var SH=[
+ {p:[.6,2.5,6.4],l:[0,1,-.6],sx:.17,orb:.5},
+ {p:[.3,7.6,3.4],l:[.2,0,-.3],sx:.17},
+ {p:[1.2,1.5,3.0],l:[2.3,1.0,.3],sx:.17},
+ {p:[3.6,.95,2.8],l:[1.4,.45,.1],sx:.17},
+ {p:[1.5,1.25,3.5],l:[1.0,.6,.1],sx:.18},
+ {p:[-.6,1.15,2.3],l:[1.0,.5,.1],sx:.17},
+ {p:[.6,4.6,9.4],l:[.9,1.6,-.4],sx:.2},
+ {p:[-1.4,.85,2.2],l:[1.0,.35,.1],sx:.17},
+ {p:[.6,4.6,9.4],l:[.9,1.6,-.4],sx:.2},
+ {p:[1.5,1.8,2.5],l:[.5,2.3,-3],sx:.17},
+ {p:[.6,4.6,9.4],l:[.9,1.6,-.4],sx:.2},
+ {p:[.3,3.2,8],l:[0,.9,-.3],sx:.12,orb:.35}
+];
+var SOL=[6,6,6,6,6,6,6,6,6,6,6,6];
+var W=1,H=1,PR=1,fov=42,lastFov=0;
+function resize(){
+ W=innerWidth;H=innerHeight;PR=Math.min(devicePixelRatio||1,2);renderer.setPixelRatio(PR);renderer.setSize(W,H,false);
+ cam.aspect=W/H;fov=W/H<1?62:42;cam.fov=fov;cam.updateProjectionMatrix();
+ U.uScale.value=H*PR/(2*Math.tan(fov*Math.PI/360));
+}
+addEventListener('resize',resize);resize();
+
+var camP=new THREE.Vector3(.6,2.5,6.4),camL=new THREE.Vector3(0,1,-.6),shift=.17,shiftY=0;
+var tP=new THREE.Vector3(),tL=new THREE.Vector3();
+var st={x:-1.4,z:.9,yaw:0,phase:0,walk:0,fall:0,wp:0},replay=false;
+var WP=[[-1.4,.9],[1.3,.9]];
+function angLerp(a,b,k){var d=Math.atan2(Math.sin(b-a),Math.cos(b-a));return a+d*k}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+var tmp=new THREE.Vector3(),tmp2=new THREE.Vector3();
+var hudT=0,T=0,last=performance.now();
+var HIP0=HIPY*.95;
+
+function update(dt){
+ T+=dt;
+ var k=reduce?1:1-Math.exp(-1.5*dt);
+ /* levels */
+ U.uTime.value=T;
+ U.uReveal.value=reduce?9:Math.min(9,U.uReveal.value+2.2*dt);
+ var tgtS=SOL[cur],dS=tgtS-U.uSolid.value;
+ U.uSolid.value=reduce?tgtS:U.uSolid.value+clamp(dS,-1.6*dt,1.6*dt);
+ clip.constant=U.uSolid.value;
+ var mv=Math.abs(dS)>.05;
+ barSolid.material.opacity+=(((mv&&Math.abs(U.uSolid.value)<5)?.45:0)-barSolid.material.opacity)*(1-Math.exp(-10*dt));
+ barSolid.position.set(U.uSolid.value,1.4,-.4);
+ var rv=U.uReveal.value<8;barReveal.material.opacity+=((rv?.4:0)-barReveal.material.opacity)*(1-Math.exp(-10*dt));barReveal.position.set(U.uReveal.value,1.4,-.4);
+
+ /* camera */
+ var s=SH[cur];tP.set(s.p[0],s.p[1],s.p[2]);tL.set(s.l[0],s.l[1],s.l[2]);
+ if(s.orb&&!reduce){var a=Math.sin(T*.15)*s.orb;var ox=tP.x-tL.x,oz=tP.z-tL.z;tP.x=tL.x+ox*Math.cos(a)+oz*Math.sin(a);tP.z=tL.z-ox*Math.sin(a)+oz*Math.cos(a)}
+ else if(!reduce){tP.x+=Math.sin(T*.35)*.08;tP.y+=Math.sin(T*.5)*.04}
+ camP.lerp(tP,k);camL.lerp(tL,k);
+ var portrait=W/H<1,tsx=portrait?0:s.sx,tsy=portrait?.2:0;
+ shift+=(tsx-shift)*k;shiftY+=(tsy-shiftY)*k;
+ cam.position.copy(camP);cam.lookAt(camL);
+ if(Math.abs(shift)>.001||Math.abs(shiftY)>.001)cam.setViewOffset(W,H,-shift*W,shiftY*H,W,H);else cam.clearViewOffset();
+ cam.updateMatrixWorld();
+
+ /* Margaret */
+ var tg;
+ /* where she goes: title = pacing; meet + problem = by the table, facing the window; kettle onward = the rug's near edge, facing the kettle */
+ if(cur===0)tg={x:WP[st.wp%2][0],z:WP[st.wp%2][1],face:null};
+ else if(cur<=2)tg={x:2.3,z:.5,face:-.41};
+ else tg={x:1.72,z:.28,face:-1.93};   /* her toe on the folded corner at the rug's edge */
+ var ft=(cur>3||(cur===3&&step>=1))?1:0;
+ /* replay: if she is already down, bring her back to her feet first, then let the fall run again */
+ if(replayReq){replayReq=false;if(st.fall>.95&&ft===1)replay=true}
+ if(replay){if(st.fall>.001)ft=0;else replay=false}
+ var dx=tg.x-st.x,dz=tg.z-st.z,d=Math.hypot(dx,dz),sp=cur<=2?.42:(cur===3?.7:1.4),moving=false;
+ if(st.fall<=.001){
+  if(d>.04){
+   if(reduce&&cur>0){st.x=tg.x;st.z=tg.z;st.yaw=Math.atan2(dx,dz)}
+   else{
+    var want=Math.atan2(dx,dz),ad=Math.abs(Math.atan2(Math.sin(want-st.yaw),Math.cos(want-st.yaw)));
+    if(cur===3&&ad>.3){st.yaw=angLerp(st.yaw,want,1-Math.exp(-.8*dt))}   /* kettle slide: turn slowly first, then walk */
+    else{var q=Math.min(d,sp*dt*(.15+.85*st.walk));st.x+=dx/d*q;st.z+=dz/d*q;moving=true;st.yaw=angLerp(st.yaw,want,1-Math.exp(-2.5*dt))}
+   }
+  }else{
+   if(cur===0)st.wp++;else if(tg.face!=null)st.yaw=angLerp(st.yaw,tg.face,1-Math.exp(-(cur===3?.8:2.5)*dt));
+  }
+ }
+ var arrived=Math.hypot(tg.x-st.x,tg.z-st.z)<=.05,tf=ft;
+ var facing=tg.face==null||Math.abs(Math.atan2(Math.sin(tg.face-st.yaw),Math.cos(tg.face-st.yaw)))<.12;
+ if(ft===1&&(!arrived||!facing)&&st.fall<.001)tf=0;   /* she only falls once she is at the rug edge and facing the kettle, so the landing spot is always the same */
+ var df=tf-st.fall;
+ st.fall=reduce?tf:st.fall+clamp(df,-dt/2.2,dt/2.6);
+ var f=st.fall;
+ function ss(a,b,x){var t=clamp((x-a)/(b-a),0,1);return t*t*(3-2*t)}
+ var A=ss(0,.3,f),B=ss(.22,.7,f),C=ss(.55,1,f),Cb=C+Math.sin(C*Math.PI)*.05,e=ss(.4,1,f);
+ st.walk+=((moving?1:0)-st.walk)*(1-Math.exp(-2.2*dt));
+ st.phase+=dt*(sp>1?5.5:3.3)*st.walk;
+ var w=st.walk*(1-A),ph=st.phase,sw=Math.sin(ph),cw=Math.cos(ph),br=Math.sin(T*1.5);
+ var nC=1-C;
+ fig.position.set(st.x,0,st.z);fig.rotation.y=st.yaw;
+ /* hip height: standing, dips as the knees buckle (B), ends at side-lying height (C) */
+ /* hips: standing height, then down to a kneel (B), then side-lying (C); the sine bumps keep the legs above the floor mid-move */
+ var hipY=HIPY-.02*Math.abs(cw)*w-.5*B*nC+.12*Math.sin(B*Math.PI)*nC+br*.003;
+ tilt.position.set(-.03*RD*C,lerp(hipY,.26,C)+.2*Math.sin(C*Math.PI)+br*.004*C,.9*ss(0,.7,f));   /* the trip carries her forward onto the rug */
+ tilt.rotation.set(.25*B*nC,0,RD*1.58*Cb);       /* pitch forward, then roll onto her side (RD picks the side) */
+ hips.rotation.z=sw*.05*w;
+ /* legs: hip flexion is negative rotation.x, knee bend is positive. Kneel = thighs a little forward, shins folded flat */
+ LL.hp.rotation.x=sw*.3*w-.6*B*nC-.5*C;
+ LR.hp.rotation.x=-sw*.3*w-.7*B*nC-.4*C;
+ LL.kn.rotation.x=.12*(1-B)+Math.max(0,cw)*.35*w+2.1*B*nC+1.1*C;
+ LR.kn.rotation.x=.12*(1-B)+Math.max(0,-cw)*.35*w+2.0*B*nC+1.0*C;
+ LL.an.rotation.x=-(LL.hp.rotation.x+LL.kn.rotation.x)*(1-B);   /* keep the feet flat until she buckles */
+ LR.an.rotation.x=-(LR.hp.rotation.x+LR.kn.rotation.x)*(1-B);
+ skirt.rotation.x=(LL.hp.rotation.x+LR.hp.rotation.x)/2;         /* skirt follows the thighs */
+ /* arms: left hangs loose, right holds the cane; both fly forward on the stumble, then rest */
+ AL.sh.rotation.x=(-.05-sw*.2*w)*(1-A)-1.4*A*nC;
+ AR.sh.rotation.x=(-.3+cw*.12*w)*(1-A)-1.5*A*nC;
+ AL.sh.rotation.z=-.12*(1-B)-.3*B*nC;
+ AR.sh.rotation.z=.12*(1-B)+.3*B*nC;
+ AL.el.rotation.x=-.25*(1-A)-.5*B*nC-.6*C;AR.el.rotation.x=-.35*(1-A)-.3*B*nC-.6*C;
+ /* once she is down: the upper arm drapes forward across her body, the lower one rests ahead of her */
+ var top=RD<0?AL:AR,bot=RD<0?AR:AL;
+ top.sh.rotation.x-=.9*C;top.sh.rotation.z-=RD*.6*C;
+ bot.sh.rotation.x-=.4*C;bot.sh.rotation.z-=RD*.15*C;
+ torso.rotation.x=.08+br*.012+.05*w+.45*A*nC+.15*C;
+ torso.rotation.y=-sw*.08*w+.4*B*nC;torso.rotation.z=sw*.03*w;
+ neck.rotation.set(.06*(1-C)-.08*A*nC+.05*C,Math.sin(T*.7)*.06*(1-B),RD*.3*C);
+ fig.updateMatrixWorld(true);
+ /* cane: its hook is placed exactly in the right hand while she stands; it drops to the rug as she goes down */
+ AR.hd.getWorldPosition(tmp);fig.worldToLocal(tmp);
+ var hold=ss(.3,.75,f);
+ cane.position.set(lerp(tmp.x,.7,hold),lerp(0,.015,hold),lerp(tmp.z,.45,hold));
+ cane.rotation.set(0,.6*hold,1.55*hold);
+ cane.scale.y=lerp(Math.max(.6,tmp.y)/.82,1,hold);
+ /* contact shadow under the hips */
+ tilt.getWorldPosition(tmp);
+ shadow.position.set(tmp.x,.008,tmp.z);shadow.rotation.set(-Math.PI/2,0,st.yaw);
+ shadow.scale.set(.7+.9*C,.7+.15*C,1);
+ fig.updateMatrixWorld(true);
+
+ /* skeleton + HUD */
+ var showSk=cur===4;
+ skM.opacity+=((showSk?.95:0)-skM.opacity)*k;kpM.opacity=skM.opacity;
+ var col=f>.75?0xE14B4B:(f>.04?0xF2B84B:0x34C3D1);kpM.color.setHex(col);
+ var minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+ JT.forEach(function(o,i){
+  o.getWorldPosition(tmp);kpPos[i*3]=tmp.x;kpPos[i*3+1]=tmp.y;kpPos[i*3+2]=tmp.z;
+  tmp2.copy(tmp).project(cam);var sx=(tmp2.x*.5+.5)*W,sy=(-tmp2.y*.5+.5)*H;
+  minX=Math.min(minX,sx);maxX=Math.max(maxX,sx);minY=Math.min(minY,sy);maxY=Math.max(maxY,sy);
+ });
+ kpG.attributes.position.needsUpdate=true;
+ BONES.forEach(function(bn,i){for(var j=0;j<3;j++){skPos[i*6+j]=kpPos[bn[0]*3+j];skPos[i*6+3+j]=kpPos[bn[1]*3+j]}});
+ skG.attributes.position.needsUpdate=true;
+ var bb=$('#bbox'),pad=22;
+ bb.style.opacity=showSk?1:0;
+ if(showSk){
+  bb.style.left=(minX-pad)+'px';bb.style.top=Math.max(30,minY-pad-26)+'px';bb.style.width=(maxX-minX+pad*2)+'px';bb.style.height=(maxY-minY+pad*2+26)+'px';
+  var hex=f>.75?'#E14B4B':(f>.04?'#F2B84B':'#34C3D1'),lab=f>.75?'FALL DETECTED':(f>.04?'FALLING':(moving?'WALKING':'STANDING'));
+  bb.style.setProperty('--st',hex);$('#bl').textContent=lab;
+  hudT-=dt;
+  if(hudT<=0){
+   hudT=.08;
+   var nk=new THREE.Vector3(kpPos[3],kpPos[4],kpPos[5]),hp=new THREE.Vector3((kpPos[24]+kpPos[27])/2,(kpPos[25]+kpPos[28])/2,(kpPos[26]+kpPos[29])/2);
+   var tv=nk.sub(hp),ang=Math.acos(clamp(Math.abs(tv.y)/(tv.length()||1),0,1))*180/Math.PI;
+   $('#vAngle').textContent=Math.round(ang)+'°';
+   $('#vHip').textContent=Math.round(clamp(hp.y/HIP0,0,1.2)*100)+'%';
+   $('#vBox').textContent=((maxX-minX)/Math.max(1,(maxY-minY))).toFixed(2);
+   var stEl=$('#state');stEl.textContent=lab;stEl.style.setProperty('--st',hex);
+  }
+ }
+
+ /* camera cone */
+ var camOn=(cur===2&&step>=1)||cur>2;
+ coneM.opacity+=((camOn?.055:0)-coneM.opacity)*k;
+ led.visible=Math.sin(T*4)>-.3;
+
+ /* net */
+ var nc=0;
+ var tint=cur>=6?0x34C3D1:0x34C3D1;netTint.lerp(new THREE.Color(tint),k);
+ netM.color.copy(netTint);
+ for(var i=0;i<NG;i++)for(var j=0;j<NG-1;j++){
+  for(var dir=0;dir<2;dir++){
+   var a0=dir?[i,j]:[j,i],a1=dir?[i,j+1]:[j+1,i];
+   for(var e2=0;e2<2;e2++){
+    var gi=e2?a1[0]:a0[0],gj=e2?a1[1]:a0[1];
+    var x=NX0+(NX1-NX0)*gi/(NG-1),z=NZ0+(NZ1-NZ0)*gj/(NG-1);
+    var dd=Math.hypot(x-st.x,z-st.z);
+    var y=.04+.06*e*Math.sin(dd*6-T*2.5)*Math.exp(-dd*.9)+(cur===0?.015*Math.sin(x*2+T*.6):0);
+    netPos[nc*3]=x;netPos[nc*3+1]=y;netPos[nc*3+2]=z;
+    var br=.14+.35*Math.exp(-dd*dd*.6)*(.4+e)+.12;
+    netCol[nc*3]=br;netCol[nc*3+1]=br;netCol[nc*3+2]=br;nc++;
+   }
+  }
+ }
+ netG.attributes.position.needsUpdate=true;netG.attributes.color.needsUpdate=true;
+
+ /* gemini star */
+ var talk=cur===5;
+ var ss=talk?.9+.06*Math.sin(T*1.6):.001;
+ star.material.opacity+=((talk?1:0)-star.material.opacity)*k;
+ star.scale.setScalar(Math.max(.001,star.scale.x+(ss-star.scale.x)*k));
+ star.position.set(st.x-.5,1.5+Math.sin(T*1.6)*.06,st.z+.2);
+ star.material.rotation=T*.4;
+
+ /* alert nodes */
+ fig.getWorldPosition(tmp);var src=tmp.clone();src.y=.5;
+ NODES.forEach(function(n,i){
+  var on=(cur===6&&step>=i+1)||cur>6;
+  var vis=cur>=6&&cur!==9;
+  n.a+=(((on&&vis)?1:0)-n.a)*(1-Math.exp(-5*dt));
+  var sc=Math.max(.001,n.a);n.g.scale.setScalar(sc);n.g.visible=n.a>.01;n.w.rotation.y=T*.8;n.w.rotation.x=T*.5;n.ring.rotation.z=T*.9;
+  n.g.position.y=n.p.y+Math.sin(T*1.2+i)*.1;
+  var pa=n.line.geometry.attributes.position.array;pa[0]=src.x;pa[1]=src.y;pa[2]=src.z;pa[3]=n.g.position.x;pa[4]=n.g.position.y;pa[5]=n.g.position.z;n.line.geometry.attributes.position.needsUpdate=true;
+  n.line.material.opacity=.7*n.a;
+  var t=((T*.55+i*.33)%1);n.pulse.position.set(src.x+(pa[3]-src.x)*t,src.y+(pa[4]-src.y)*t,src.z+(pa[5]-src.z)*t);n.pulse.visible=n.a>.4;
+  var tag=tags[i];tmp2.copy(n.g.position);tmp2.y+=.9;tmp2.project(cam);
+  tag.style.transform='translate('+((tmp2.x*.5+.5)*W)+'px,'+((-tmp2.y*.5+.5)*H)+'px) translate(-50%,-100%)';
+  tag.style.opacity=(cur===6&&n.a>.6)?1:0;
+ });
+ warm.intensity=1.3+Math.sin(T*2)*.05;
+
+ /* kettle steam while it whistles (slide 4) */
+ steamOn+=(((cur===3)?1:0)-steamOn)*k;
+ steam.forEach(function(s2,i){
+  var t=(T*.35+s2.userData.ph)%1,sc=.06+.16*t;
+  s2.position.set(-2.88+Math.sin(T*1.3+i)*.06*t,1.24+t*.55,-2.7+Math.cos(T*1.1+i)*.05*t);
+  s2.scale.set(sc,sc,1);s2.material.opacity=steamOn*.55*(1-t)*Math.min(1,t*6);
+ });
+
+ /* who is speaking on the Talk slide: odd steps are the voice, even steps are Margaret */
+ var camTalk=cur===5&&step>0&&step%2===1,marTalk=cur===5&&step>0&&step%2===0;
+ tmp2.set(.5,2.35,-3.0).project(cam);
+ spkC.style.transform='translate('+((tmp2.x*.5+.5)*W)+'px,'+((-tmp2.y*.5+.5)*H)+'px) translate(-50%,0)';
+ head.getWorldPosition(tmp2);tmp2.y+=.28;tmp2.project(cam);
+ spkM.style.transform='translate('+((tmp2.x*.5+.5)*W)+'px,'+((-tmp2.y*.5+.5)*H)+'px) translate(-50%,-100%)';
+ spkC.style.opacity=camTalk?1:0;spkM.style.opacity=marTalk?1:0;
+}
+function frame(now){
+ requestAnimationFrame(frame);
+ var dt=Math.min(.05,(now-last)/1000);last=now;
+ update(dt);renderer.render(scene,cam);
+}
+requestAnimationFrame(function(t){last=t;frame(t)});
+})();
+</script>
+
+</body>
+</html>
